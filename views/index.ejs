@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: beige;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Chat Container */
+#chat-container {
+    width: 360px;
+    background: #f9f7ce;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chat Box */
+#chat-box {
+    height: 320px;
+    overflow-y: auto;
+    padding: 12px;
+    background: #f9f7ce;
+    border-bottom: 1px solid #eee;
+}
+
+/* Messages */
+.msg {
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 12px;
+    max-width: 70%;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* My Message */
+.me {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff;
+    margin-left: auto;
+    border-bottom-right-radius: 3px;
+}
+
+/* Other Message */
+.other {
+    background: #f9f7ce;
+    color: #111827;
+    border-bottom-left-radius: 3px;
+}
+
+/* Input Area */
+#input-area {
+    display: flex;
+    background: #fff;
+}
+
+/* Input Field */
+#msginput {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Button */
+#btn {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Hover Effect */
+#btn:hover {
+    background: linear-gradient(135deg, #4338ca, #4f46e5);
+}</style>
+   
+   <h1>chating app</h1>
+<div id="chat-container">
+    <div id="chat-box"></div>
+
+    <div id="input-area">
+        <input type="text" id="msginput" placeholder="Enter your msg">
+        <button id="btn">Send</button>
+    </div>
+</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+     const socket = io();
+
+const msgInput = document.querySelector("#msginput");
+const sendBtn = document.querySelector("#btn");
+const chatBox = document.querySelector("#chat-box");
+
+// receive message from server
+socket.on("message", (message) => {
+    addMessage(message, "other");
+});
+
+// send message on button click
+sendBtn.addEventListener("click", sendMessage);
+
+// send message on Enter key
+msgInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        sendMessage();
+    }
+});
+
+function sendMessage() {
+    const message = msgInput.value.trim();
+
+    if (!message) return;
+
+    addMessage(message, "me");
+    socket.emit("message", message);
+
+    msgInput.value = "";
+}
+
+function addMessage(text, type) {
+    const p = document.createElement("p");
+    p.textContent = text;
+
+    // add CSS classes
+    p.classList.add("msg", type);
+
+    chatBox.appendChild(p);
+
+    // auto scroll
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+   </script>
+</body>
+</html>
